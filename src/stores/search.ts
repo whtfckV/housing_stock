@@ -62,12 +62,22 @@ export const useSearchStore = defineStore('search', () => {
       // т.к. jsonplaceholder не поддерживает пагинацию на данном эндпоинте
       size.value = data.length
 
-      // Если первая страница то меняем данные
-      if (page.value === 1) {
-        users.value = data
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Ошибка запроса')
+        }
+        if (response.status === 401) {
+          throw new Error('Нет доступа')
+        }
+        throw new Error('Произошла ошибка')
       } else {
-        // иначе дописываем в конец
-        users.value.push(...data)
+        // Если первая страница то меняем данные
+        if (page.value === 1) {
+          users.value = data
+        } else {
+          // иначе дописываем в конец
+          users.value.push(...data)
+        }
       }
     } catch (e) {
       // Очень по простому
